@@ -1,7 +1,12 @@
 const redux = require('redux');
 const createStore = redux.createStore;
-// const cr = redux.combineReducers;
+const cr = redux.combineReducers;
 // console.log(cr);
+const applymiddleware = redux.applyMiddleware;
+const reduxlogger = require('redux-logger');
+const logger = reduxlogger.createLogger();
+
+
 
 function buycake() {
     return {
@@ -50,8 +55,8 @@ const icecreamreducer = (state = initialicecreamstate, action) => {
       return state
   }
 }
-const cakestore = createStore(cakereducer);
-const icecreamstore = createStore(icecreamreducer)
+// const cakestore = createStore(cakereducer);
+// const icecreamstore = createStore(icecreamreducer)
 
 // const reducer = (state = initialstate, action) => {
 //     // console.log(action.type === 'BUY_CAKE')
@@ -73,14 +78,21 @@ const icecreamstore = createStore(icecreamreducer)
 
 // const store = createStore(reducer);
 // console.log(store);
-console.log('initial state', cakestore.getState())
-const unsuscribe=cakestore.subscribe(() => console.log('updated state' , cakestore.getState()))
-cakestore.dispatch(buycake())
-cakestore.dispatch(buycake())
-cakestore.dispatch(buycake())
 
-const icecreamunsuscribe=icecreamstore.subscribe(() => console.log('updated state' , icecreamstore.getState()))
-icecreamstore.dispatch(buyicecream())
-icecreamstore.dispatch(buyicecream())
-icecreamstore.dispatch(buyicecream())
-icecreamunsuscribe()
+const rootreducer = cr({
+  cake: cakereducer,
+  icecream: icecreamreducer,
+})
+
+const store = createStore(rootreducer, applymiddleware(logger))
+console.log('initial state', store.getState())
+const unsuscribe = store.subscribe(() => {})
+store.dispatch(buycake())
+store.dispatch(buycake())
+store.dispatch(buycake())
+
+// const unsuscribe=store.subscribe(() => console.log('updated state' , store.getState()))
+store.dispatch(buyicecream())
+store.dispatch(buyicecream())
+store.dispatch(buyicecream())
+unsuscribe()
